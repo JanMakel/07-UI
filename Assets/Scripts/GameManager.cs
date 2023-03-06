@@ -2,33 +2,40 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
     public GameObject[] targetPrefabs;
     public bool isGameOver;
-    public float spawnRate = 0.5f;
-    public List<Vector3> targetPositionsInScene;
-    public Vector3 randomPos;
-    public TextMeshProUGUI scoreText;
     
+    public List<Vector3> targetPositionsInScene;
+   
+    public TextMeshProUGUI scoreText;
+    public TextMeshProUGUI livesText;
+    public GameObject gameOverPanel;
+    public GameObject startGamePanel;
+    public bool hasPowerUpShield;
+
+
+
     private float minX = -3.75f;
     private float minY = -3.75f;
     private float distanceBetweenSquares = 2.5f;
     private int score;
+    private Vector3 randomPos;
+    private float spawnRate = 1f;
+    private int lives = 3;
 
 
 
 
     private void Start()
     {
-        isGameOver = false;
-        StartCoroutine("SpawnRandomTarget");
-        scoreText.text = $"Score: {score}";
-
-
+        startGamePanel.SetActive(true);
+        gameOverPanel.SetActive(false);
     }
-    
+
     public void UpdateScore(int newPoints)
     {
         score += newPoints;
@@ -57,4 +64,40 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    
+
+    public void GameOver()
+    {
+        isGameOver = true;
+        gameOverPanel.gameObject.SetActive(true);
+    }
+
+    public void RestartGame()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
+    public void StartGame(int difficulty)
+    {
+        isGameOver = false;
+        score = 0;
+        UpdateScore(0);
+        livesText.text = $"Lives: {lives}";
+        spawnRate /= difficulty;
+        StartCoroutine(SpawnRandomTarget());
+        startGamePanel.SetActive(false);
+        gameOverPanel.SetActive(false);
+    }
+
+    public void minusLive()
+    {
+        lives--;
+        livesText.text = $"Lives: {lives}";
+        if(lives <= 0)
+        {
+            GameOver();
+        }
+    }
+
+  
 }
